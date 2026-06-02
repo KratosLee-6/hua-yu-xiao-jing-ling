@@ -14,7 +14,7 @@ let CONFIG = {
     apiKey: '',
     model: 'MiniMax-M2.7',
     temperature: 0.7,
-    maxTokens: 4000
+    maxTokens: 8000
   },
   enabled: true,
   _ready: false
@@ -251,7 +251,7 @@ async function aiComplete({ prompt, systemPrompt, mode }) {
   }
 
   // ========== 带超时和重试的 fetch ==========
-  const AI_TIMEOUT_MS = 90000;
+  const AI_TIMEOUT_MS = 180000;
   const AI_MAX_RETRIES = 2;
 
   async function fetchWithRetry(url, fetchOpts) {
@@ -284,7 +284,7 @@ async function aiComplete({ prompt, systemPrompt, mode }) {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userContent }
         ],
-        max_tokens: CONFIG.ai.maxTokens || 4000
+        max_tokens: CONFIG.ai.maxTokens || 8000
       };
       if (CONFIG.ai.temperature !== undefined) body.temperature = CONFIG.ai.temperature;
       return body;

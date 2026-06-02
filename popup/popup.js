@@ -70,7 +70,7 @@
         if (ep) ep.value = a.endpoint || '';
         if (m) m.value = a.model || '';
         if (k) k.value = a.apiKey || '';
-        if (tk) tk.value = a.maxTokens || 4000;
+        if (tk) tk.value = a.maxTokens || 8000;
         updateApiInfo(a);
       }
 
@@ -110,7 +110,7 @@
       var ep = $('inpEndpoint')?.value.trim() || '';
       var m = $('inpModel')?.value.trim() || '';
       var key = $('inpKey')?.value.trim() || '';
-      var tk = parseInt($('inpTokens')?.value) || 4000;
+      var tk = parseInt($('inpTokens')?.value) || 8000;
       if (!ep) { showMsg('请填写 API 地址', 'err'); return; }
       if (!m) { showMsg('请填写模型名称', 'err'); return; }
       if (!key) { showMsg('请填写 API Key', 'err'); return; }
