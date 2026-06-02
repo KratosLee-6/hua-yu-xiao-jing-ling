@@ -1,6 +1,7 @@
 # 打包产物
 *.tar.gz
 *.zip
+*.pptx
 
 # ppt-master 输出示例（不属于插件项目）
 starry-night-art-plan_ppt169_20260524/
