@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>画语小精灵</title>
+<link rel="stylesheet" href="../common.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:100%;min-height:100dvh;font-family:var(--font-family);background:var(--bg-body);font-size:13px;color:var(--text-primary);display:flex;flex-direction:column;height:100dvh}
+
+/* ===== 头部 ===== */
+.panel-header{background:var(--edu-gradient);color:#fff;padding:18px 20px;border-radius:0 0 18px 18px;flex-shrink:0}
+.panel-header h1{font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px}
+.panel-header p{font-size:11px;opacity:.85;margin-top:4px;font-weight:400}
+
+/* ===== Tab导航 ===== */
+.tabs{display:flex;background:var(--bg-card);padding:6px 8px;gap:3px;border-bottom:1px solid var(--border-color);flex-shrink:0;overflow-x:auto}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:50px;padding:8px 4px;text-align:center;border-radius:10px;font-size:11px;cursor:pointer;transition:all .2s;background:var(--bg-hover);color:var(--text-secondary);white-space:nowrap;font-weight:500;border:none;font-family:inherit}
+.tab.active{background:var(--edu-gradient);color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(232,120,59,.25)}
+.tab:not(.active):hover{background:#FFE8D6;color:var(--edu-primary)}
+
+/* 主内容 */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* ===== 面板通用 ===== */
+.panel{display:none;flex-direction:column;padding:12px;flex:1;overflow-y:auto;gap:10px}
+.panel.active{display:flex}
+
+/* ===== 消息流（对话/分析结果） ===== */
+.message-area{flex:1;overflow-y:auto;padding:4px 0;display:flex;flex-direction:column;gap:8px}
+.message-area::-webkit-scrollbar{width:4px}
+.message-area::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px}
+
+.msg{display:flex;gap:8px;animation:fadeIn .25s ease}
+.msg.user{flex-direction:row-reverse}
+.msg .avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px}
+.msg.user .avatar{background:var(--edu-primary);color:#fff}
+.msg.assistant .avatar{background:var(--bg-hover);color:var(--text-secondary)}
+.msg .bubble{max-width:82%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.msg.user .bubble{background:var(--edu-gradient);color:#fff;border-bottom-right-radius:4px}
+.msg.assistant .bubble{background:var(--bg-card);color:var(--text-primary);border-bottom-left-radius:4px;box-shadow:var(--shadow-sm)}
+.msg.tool .bubble{background:#F0F7FF;color:var(--edu-info);font-size:12px;border:1px solid #D0E4F7;border-radius:10px}
+.msg.error .bubble{background:#FFF5F5;color:#E76F51;border:1px solid #FFD0D0;border-radius:10px;font-size:12px}
+.msg.loading .bubble{display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:12px}
+.msg.loading .bubble::after{content:'';width:14px;height:14px;border:2px solid #ddd;border-top-color:var(--edu-primary);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== 卡片 ===== */
+.card{background:var(--bg-card);border-radius:var(--radius-lg);padding:14px;box-shadow:var(--shadow-sm)}
+.card-title{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--text-primary);display:flex;align-items:center;gap:6px}
+
+/* ===== 模式切换 ===== */
+.mode-tabs{display:flex;gap:4px;margin-bottom:10px}
+.mode-tab{flex:1;padding:10px 6px;text-align:center;border-radius:10px;border:2px solid var(--border-color);background:var(--bg-card);font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+.mode-tab:hover{border-color:var(--edu-primary);background:var(--edu-primary-light)}
+.mode-tab.active{border-color:var(--edu-primary);background:var(--edu-gradient-subtle);font-weight:700;color:var(--edu-primary)}
+.mode-tab .mode-icon{font-size:18px;display:block;margin-bottom:2px}
+.mode-tab .mode-label{font-size:12px;font-weight:600}
+.mode-tab .mode-desc{font-size:10px;color:var(--text-muted);margin-top:1px}
+
+/* ===== 表单 ===== */
+.form-group{margin-bottom:10px}
+.form-group label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:4px;font-weight:600}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 12px;border:1.5px solid var(--border-input);border-radius:10px;font-size:13px;font-family:inherit;background:var(--bg-input);color:var(--text-primary);outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--edu-primary);box-shadow:0 0 0 3px rgba(232,120,59,.08)}
+.form-group textarea{min-height:80px;resize:vertical}
+.form-group select{appearance:none;cursor:pointer}
+
+/* ===== 按钮 ===== */
+.btn{padding:10px 20px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn-primary{background:var(--edu-gradient);color:#fff;box-shadow:0 2px 10px rgba(232,120,59,.25)}
+.btn-primary:hover:not(:disabled){box-shadow:0 4px 16px rgba(232,120,59,.35);transform:translateY(-1px)}
+.btn-primary:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;transform:none}
+.btn-outline{background:var(--bg-card);color:var(--text-primary);border:1.5px solid var(--border-color)}
+.btn-outline:hover{border-color:var(--edu-primary);color:var(--edu-primary)}
+.btn-sm{padding:6px 12px;font-size:11px;border-radius:8px}
+.btn-full{width:100%}
+
+/* ===== 快捷指令 ===== */
+.quick-cmds{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.quick-cmd{padding:5px 10px;border-radius:14px;border:1.5px solid var(--border-color);background:var(--bg-card);font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.quick-cmd:hover{border-color:var(--edu-primary);background:var(--edu-primary-light);color:var(--edu-primary)}
+
+/* ===== 输入区 ===== */
+.input-area{flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card);padding:10px 12px}
+.input-row{display:flex;gap:8px;align-items:flex-end}
+.input-area textarea{flex:1;min-height:38px;max-height:100px;padding:9px 12px;border:1.5px solid var(--border-input);border-radius:12px;font-size:13px;resize:none;line-height:1.5;outline:none;font-family:inherit;background:var(--bg-input);color:var(--text-primary)}
+.input-area textarea:focus{border-color:var(--edu-primary)}
+.input-area button{width:40px;height:40px;border-radius:12px;border:none;background:var(--edu-gradient);color:#fff;font-size:18px;cursor:pointer;flex-shrink:0;transition:all .2s}
+.input-area button:hover{box-shadow:0 4px 16px rgba(232,120,59,.3)}
+.input-area button:disabled{background:#ccc;cursor:not-allowed;box-shadow:none}
+
+/* ===== 设置页 ===== */
+.settings-card{background:var(--bg-card);border-radius:var(--radius-lg);padding:14px;box-shadow:var(--shadow-sm)}
+.settings-card h3{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text-primary)}
+
+/* ===== 状态指示 ===== */
+.status-mini{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-card);border-radius:10px;font-size:12px;color:var(--text-secondary);box-shadow:var(--shadow-sm)}
+.status-mini .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background .3s}
+.status-mini .dot.ok{background:var(--edu-success);box-shadow:0 0 6px rgba(82,183,136,.3)}
+.status-mini .dot.err{background:var(--color-error);box-shadow:0 0 6px rgba(231,111,81,.3)}
+.status-mini .dot.loading{background:var(--edu-warning);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ===== 空状态 ===== */
+.empty-hint{text-align:center;color:var(--text-placeholder);font-size:12px;padding:32px 20px;line-height:1.8}
+.empty-hint .icon{font-size:36px;margin-bottom:8px;opacity:.5}
+
+/* ===== 功能性按钮组 ===== */
+.action-btns{display:flex;gap:6px;flex-wrap:wrap}
+.action-btn{flex:1;min-width:60px;padding:8px 6px;border-radius:10px;border:1.5px solid var(--border-color);background:var(--bg-card);font-size:11px;cursor:pointer;text-align:center;transition:all .15s;font-family:inherit;font-weight:500}
+.action-btn:hover{border-color:var(--edu-primary);background:var(--edu-primary-light);color:var(--edu-primary)}
+</style>
+</head>
+<body>
+
+<!-- 头部 -->
+<div class="panel-header">
+  <h1>🎨 画语小精灵</h1>
+  <p id="pageInfo">小学美术教学智能助手 · 基于2022艺术课标</p>
+</div>
+
+<!-- Tab导航 -->
+<div class="tabs">
+  <button class="tab active" data-tab="analyze">🎨 画作分析</button>
+  <button class="tab" data-tab="lesson">📚 教案生成</button>
+  <button class="tab" data-tab="cross">🌐 跨学科</button>
+  <button class="tab" data-tab="history">📋 历史</button>
+  <button class="tab" data-tab="settings">⚙️ 设置</button>
+</div>
+
+<div class="main">
+
+  <!-- ===== 画作分析 ===== -->
+  <div class="panel active" id="panel-analyze">
+
+    <!-- 模式切换 -->
+    <div class="mode-tabs" id="modeTabs">
+      <button class="mode-tab active" data-mode="student">
+        <span class="mode-icon">🎨</span>
+        <span class="mode-label">学生专区</span>
+        <span class="mode-desc">鼓励评语</span>
+      </button>
+      <button class="mode-tab" data-mode="parent">
+        <span class="mode-icon">👨‍👩‍👧</span>
+        <span class="mode-label">家长专区</span>
+        <span class="mode-desc">画作解读</span>
+      </button>
+      <button class="mode-tab" data-mode="teacher">
+        <span class="mode-icon">📚</span>
+        <span class="mode-label">教师专区</span>
+        <span class="mode-desc">专业分析</span>
+      </button>
+    </div>
+
+    <!-- 消息流 -->
+    <div class="message-area" id="msgAreaMain">
+      <div class="empty-hint" id="emptyHintMain">
+        <div class="icon">🎨</div>
+        描述一幅学生画作，我来帮您分析<br>
+        <span style="font-size:10px;color:var(--text-muted)">可以描述画面内容、颜色、构图等</span>
+      </div>
+    </div>
+
+    <!-- 快捷指令 -->
+    <div class="quick-cmds" id="quickCmds"></div>
+
+    <!-- 输入框 -->
+    <div class="input-area">
+      <div class="input-row">
+        <textarea id="inputMain" placeholder="描述学生画作，或输入指令..." rows="1"></textarea>
+        <button id="btnSendMain" title="发送">↑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 教案生成 ===== -->
+  <div class="panel" id="panel-lesson">
+    <div class="card">
+      <div class="card-title">📚 教案信息</div>
+      <div class="form-group">
+        <label>课题名称 *</label>
+        <input type="text" id="lessonTopic" placeholder="如：美丽的色彩世界">
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="form-group" style="flex:1">
+          <label>适用年级</label>
+          <select id="lessonGrade">
+            <option value="小学一年级">小学一年级</option>
+            <option value="小学二年级">小学二年级</option>
+            <option value="小学三年级" selected>小学三年级</option>
+            <option value="小学四年级">小学四年级</option>
+            <option value="小学五年级">小学五年级</option>
+            <option value="小学六年级">小学六年级</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>课时安排</label>
+          <select id="lessonDuration">
+            <option value="1课时" selected>1课时（40分钟）</option>
+            <option value="2课时">2课时</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>课型</label>
+        <select id="lessonType">
+          <option value="造型·表现" selected>造型·表现</option>
+          <option value="设计·应用">设计·应用</option>
+          <option value="欣赏·评述">欣赏·评述</option>
+          <option value="综合·探索">综合·探索</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>参考画作/学生背景（可选）</label>
+        <textarea id="lessonContext" placeholder="如：学生近期对色彩表现出浓厚兴趣，但搭配能力有待提升..." rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>额外要求（可选）</label>
+        <input type="text" id="lessonExtra" placeholder="如：需要融入小组合作环节">
+      </div>
+      <button class="btn btn-primary btn-full" id="btnGenLesson">✨ 生成完整教案</button>
+    </div>
+
+    <!-- 教案结果 -->
+    <div class="message-area" id="msgAreaLesson" style="min-height:100px">
+      <div class="empty-hint">
+        <div class="icon">📝</div>
+        填写信息后点击生成，完整教案将显示在这里
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 跨学科 ===== -->
+  <div class="panel" id="panel-cross">
+    <div class="card">
+      <div class="card-title">🌐 跨学科延伸探索</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">
+        输入画作主题或描述，发现美术与其他学科的融合教学点
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px" id="subjectChips"></div>
+      <div class="form-group">
+        <label>画作描述</label>
+        <textarea id="crossInput" placeholder="描述学生画作的主题、内容、风格..." rows="2"></textarea>
+      </div>
+      <button class="btn btn-primary btn-full" id="btnCrossAnalyze">🔍 探索跨学科连接</button>
+    </div>
+    <div class="message-area" id="msgAreaCross" style="min-height:100px">
+      <div class="empty-hint">
+        <div class="icon">🌐</div>
+        输入画作内容，AI将推荐跨学科融合方案
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 历史 ===== -->
+  <div class="panel" id="panel-history">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;font-weight:600">📋 分析记录</span>
+      <button class="btn btn-outline btn-sm" id="btnClearHistory">🗑️ 清空</button>
+    </div>
+    <div class="message-area" id="msgAreaHistory">
+      <div class="empty-hint">
+        <div class="icon">📋</div>
+        暂无分析记录<br>
+        <span style="font-size:10px;color:var(--text-muted)">在「画作分析」中进行的分析会自动保存</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 设置 ===== -->
+  <div class="panel" id="panel-settings">
+    <div class="settings-card">
+      <h3>🤖 AI 服务商</h3>
+      <div class="form-group">
+        <label>服务商</label>
+        <select id="aiProvider"></select>
+      </div>
+      <div class="form-group">
+        <label>API 地址</label>
+        <input type="text" id="aiEndpoint" placeholder="选择服务商后自动填入">
+      </div>
+      <div class="form-group">
+        <label>API Key</label>
+        <input type="password" id="aiApiKey" placeholder="输入 API Key">
+      </div>
+      <div class="form-group">
+        <label>模型名称</label>
+        <input type="text" id="aiModel" placeholder="如 MiniMax-M2.7">
+      </div>
+      <button class="btn btn-primary btn-full" id="btnSaveSettings">💾 保存设置</button>
+      <div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:8px">
+        设置保存在本地，不会上传到任何服务器 · 使用免费/自带Key
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h3>📖 关于画语小精灵</h3>
+      <div style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+        <p>基于《义务教育艺术课程标准（2022年版）》设计</p>
+        <p>核心功能：画作心理分析 · 多元评价 · 跨学科延伸 · 教案生成</p>
+        <p style="margin-top:8px;color:var(--text-muted)">v1.0.0 · 作者：祖娴 · 2026</p>
+        <p style="margin-top:4px;color:var(--edu-warning);font-weight:500">
+          ⚠️ 心理学分析由AI生成，仅供参考，不具备医疗级诊断效力
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .main -->
+
+<script src="sidepanel.js"></script>
+</body>
+</html>

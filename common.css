@@ -1,0 +1,87 @@
+/* common.css — 画语小精灵 公共变量 + 暗色模式 */
+/* 暖色调教育主题 */
+
+:root {
+  /* 品牌色 — 温暖教育橙 */
+  --edu-primary: #E8783B;
+  --edu-primary-hover: #D0682B;
+  --edu-primary-light: #FFF4ED;
+  --edu-gradient: linear-gradient(135deg, #E8783B, #F4A261);
+  --edu-gradient-subtle: linear-gradient(135deg, #FFF4ED, #FFE8D6);
+
+  /* 辅助色 */
+  --edu-success: #52B788;
+  --edu-warning: #F4A261;
+  --edu-info: #457B9D;
+  --edu-creative: #9B5DE5;
+  --edu-warm: #F4A261;
+
+  /* 功能色 */
+  --color-success: #52B788;
+  --color-warning: #E9C46A;
+  --color-error: #E76F51;
+  --color-info: #457B9D;
+
+  /* 表面色 */
+  --bg-body: #FEF9F4;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --bg-hover: #FFF4ED;
+  --bg-overlay: rgba(232, 120, 59, 0.04);
+
+  /* 边框 */
+  --border-color: #F0E4D8;
+  --border-input: #E0D4C8;
+  --border-focus: var(--edu-primary);
+
+  /* 文字 */
+  --text-primary: #2D2D2D;
+  --text-secondary: #6B5E53;
+  --text-muted: #A0988C;
+  --text-placeholder: #C4B8A8;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 4px rgba(180, 120, 60, 0.06);
+  --shadow-md: 0 2px 12px rgba(232, 120, 59, 0.12);
+  --shadow-lg: 0 8px 24px rgba(232, 120, 59, 0.15);
+
+  /* 圆角 */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* 字体 */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-size-xs: 10px;
+  --font-size-sm: 11px;
+  --font-size-base: 13px;
+  --font-size-lg: 15px;
+  --font-size-xl: 18px;
+}
+
+/* ========== 暗色模式 ========== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --edu-primary-light: #3D2010;
+    --edu-gradient-subtle: linear-gradient(135deg, #2D2018, #3D2818);
+
+    --bg-body: #1A1816;
+    --bg-card: #2A2622;
+    --bg-input: #332E28;
+    --bg-hover: #3D3428;
+    --bg-overlay: rgba(232, 120, 59, 0.06);
+
+    --border-color: #3D3428;
+    --border-input: #4D4438;
+
+    --text-primary: #E8E0D8;
+    --text-secondary: #B8A898;
+    --text-muted: #887868;
+    --text-placeholder: #685848;
+
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 2px 12px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+}

@@ -1,0 +1,26 @@
+# 打包产物
+*.tar.gz
+*.zip
+
+# ppt-master 输出示例（不属于插件项目）
+starry-night-art-plan_ppt169_20260524/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 依赖
+node_modules/
+
+# 临时文件
+*.tmp
+*.log
+_temp_skill/
