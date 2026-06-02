@@ -20,31 +20,33 @@ async function runTest() {
   statusEl.style.background = '#fff3cd';
 
   // Step 1: 动态加载 PptxGenJS
-  log('Step 1: 动态加载 PptxGenJS...');
+  // Step 1: 先测试本地文件
+  log('Step 1a: 加载本地 PptxGenJS...');
+  let loaded = false;
   try {
     await new Promise((resolve, reject) => {
       const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
-      s.onload = resolve;
-      s.onerror = () => reject(new Error('CDN加载失败'));
+      s.src = '../lib/pptxgen.bundle.js';
+      s.onload = () => { loaded = true; resolve(); };
+      s.onerror = () => reject(new Error('本地加载失败'));
       document.head.appendChild(s);
     });
-    log('✅ CDN加载成功');
+    log('✅ 本地文件加载成功');
   } catch(e) {
-    log('❌ CDN加载失败: ' + e.message);
-    // 尝试本地加载
-    log('Step 1b: 尝试本地加载...');
+    log('❌ 本地加载失败: ' + e.message);
+    // Fallback: CDN
+    log('Step 1b: 尝试CDN加载...');
     try {
       await new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = '../lib/pptxgen.bundle.js';
-        s.onload = resolve;
-        s.onerror = () => reject(new Error('本地加载失败'));
+        s.src = 'https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
+        s.onload = () => { loaded = true; resolve(); };
+        s.onerror = () => reject(new Error('CDN加载失败'));
         document.head.appendChild(s);
       });
-      log('✅ 本地加载成功');
+      log('✅ CDN加载成功');
     } catch(e2) {
-      log('❌ 本地也加载失败: ' + e2.message);
+      log('❌ CDN也加载失败: ' + e2.message);
       statusEl.textContent = '❌ 库加载失败';
       statusEl.style.background = '#f8d7da';
       return;
