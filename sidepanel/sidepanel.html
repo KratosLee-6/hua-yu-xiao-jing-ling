@@ -234,6 +234,13 @@ body{width:100%;min-height:100dvh;font-family:var(--font-family);background:var(
         填写信息后点击生成，完整教案将显示在这里
       </div>
     </div>
+    <!-- PPT导出按钮（教案生成后显示） -->
+    <div id="pptExportArea" style="display:none;margin-top:8px">
+      <button class="btn btn-primary btn-full" id="btnExportPPT">📥 导出PPT课件</button>
+      <div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px">
+        自动解析教案内容，生成可编辑的PPTX文件
+      </div>
+    </div>
   </div>
 
   <!-- ===== 跨学科 ===== -->
@@ -315,5 +322,7 @@ body{width:100%;min-height:100dvh;font-family:var(--font-family);background:var(
 </div><!-- .main -->
 
 <script src="sidepanel.js"></script>
+<script src="../lib/pptxgen.bundle.js"></script>
+<script src="../lib/ppt-generator.js"></script>
 </body>
 </html>

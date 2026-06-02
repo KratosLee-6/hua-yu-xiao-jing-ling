@@ -229,8 +229,11 @@ async function handleSendMain() {
 // =====================================================================
 // 教案生成
 // =====================================================================
+let _lastLessonPlan = { text: '', topic: '' };
+
 function initLesson() {
   $('#btnGenLesson')?.addEventListener('click', handleGenLesson);
+  $('#btnExportPPT')?.addEventListener('click', handleExportPPT);
 }
 
 async function handleGenLesson() {
@@ -256,6 +259,10 @@ async function handleGenLesson() {
     const res = await chrome.runtime.sendMessage({ action: 'generateLessonPlan', payload: inputs });
     if (!res.success) throw new Error(res.error);
     updateMsg(loadingId, 'assistant', res.data);
+    // 保存教案文本并显示PPT导出按钮
+    _lastLessonPlan = { text: res.data, topic: inputs.topic };
+    const exportArea = $('#pptExportArea');
+    if (exportArea) exportArea.style.display = 'block';
   } catch (err) {
     updateMsg(loadingId, 'error', '教案生成失败：' + err.message);
   }
@@ -264,6 +271,35 @@ async function handleGenLesson() {
   // 自动切换到教案Tab查看结果
   const area = $('#msgAreaLesson');
   if (area) area.scrollTop = area.scrollHeight;
+}
+
+async function handleExportPPT() {
+  if (!_lastLessonPlan.text) {
+    alert('请先生成教案');
+    return;
+  }
+  const btn = $('#btnExportPPT');
+  if (btn) { btn.disabled = true; btn.textContent = '\u{23F3} 正在生成PPT...'; }
+
+  try {
+    if (typeof EduPPTGenerator === 'undefined') {
+      throw new Error('PPT生成模块未加载，请刷新页面后重试');
+    }
+    const result = await EduPPTGenerator.generate(_lastLessonPlan.text, _lastLessonPlan.topic);
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = `\u{2705} 已下载 · ${result.slideCount}页PPT`;
+      btn.style.background = '#52B788';
+      setTimeout(() => {
+        btn.textContent = '\u{1F4E5} 导出PPT课件';
+        btn.style.background = '';
+      }, 3000);
+    }
+    addMsg('#msgAreaLesson', 'tool', `\u{2705} PPT课件已生成并下载！\n\n\u{1F4CA} 共 ${result.slideCount} 页幻灯片\n\u{1F4E6} 文件：${result.filename}\n\n用 PowerPoint 或 WPS 打开即可编辑。`);
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = '\u{1F4E5} 导出PPT课件'; }
+    addMsg('#msgAreaLesson', 'error', `PPT导出失败：${err.message}`);
+  }
 }
 
 // =====================================================================

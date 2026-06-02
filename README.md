@@ -1,6 +1,6 @@
 # 画语小精灵 — 小学美术教学智能助手
 
-[![Version](https://img.shields.io/badge/version-v1.0.0-orange)](https://github.com/KratosLee-6/art-elf)
+[![Version](https://img.shields.io/badge/version-v1.1.0-orange)](https://github.com/KratosLee-6/hua-yu-xiao-jing-ling)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Manifest](https://img.shields.io/badge/manifest-MV3-blue)](https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3)
 
@@ -17,7 +17,7 @@
 | Tab | 功能说明 |
 |-----|----------|
 | **🎨 画作分析** | 描述学生画作 → AI 四维度分析（色彩/构图/造型/创意），支持三种模式切换 |
-| **📚 教案生成** | 填写课题/年级/课型 → AI 生成完整教案（含教学目标、重难点、教学过程、评价量表） |
+| **📚 教案生成** | 填写课题/年级/课型 → AI 生成完整教案 → 一键导出PPT课件（可编辑PPTX） |
 | **🌐 跨学科** | 发现美术与语文/数学/科学/音乐/心理健康等 9 大学科的融合教学点 |
 | **📋 历史** | 查看和回顾之前的分析记录，支持一键清空 |
 | **⚙️ 设置** | 配置 AI 服务商、API Key、模型参数 |
@@ -131,6 +131,9 @@
 ├── sidepanel/
 │   ├── sidepanel.html         # 侧边栏界面（5个Tab）
 │   └── sidepanel.js           # 侧边栏逻辑
+├── lib/
+│   ├── pptxgen.bundle.js      # PptxGenJS PPT生成库
+│   └── ppt-generator.js       # 教育PPT模板生成器
 ├── icons/                     # 扩展图标
 ├── .gitignore
 ├── LICENSE
@@ -156,6 +159,12 @@ A：全部教案基于《义务教育艺术课程标准（2022年版）》生成
 ---
 
 ## 更新日志
+
+- **v1.1.0**（2026-06）：
+  - 🆕 教案→PPT一键导出：AI教案自动解析为可编辑PPTX课件
+  - 🆕 教育PPT模板：封面/教学目标/重难点/5环节教学过程/评价设计/板书设计/结束页
+  - 🆕 暖色调教育配色方案，PowerPoint/WPS打开即可编辑修改
+  - 优化 manifest 版本号统一管理
 
 - **v1.0.0**（2026-06）：
   - 🆕 画作四维度分析（色彩/构图/造型/创意）

@@ -1,13 +1,14 @@
 {
   "manifest_version": 3,
   "name": "画语小精灵",
-  "version": "1.0.0",
-  "description": "小学美术教学智能助手——画作心理分析、多元评价、跨学科延伸、教案生成，基于2022艺术课标",
+  "version": "1.1.0",
+  "description": "小学美术教学智能助手——画作心理分析、多元评价、跨学科延伸、教案生成、PPT导出，基于2022艺术课标",
   "permissions": [
     "storage",
     "clipboardWrite",
     "sidePanel",
-    "tabs"
+    "tabs",
+    "downloads"
   ],
   "host_permissions": [
     "https://api.minimaxi.com/*",
@@ -39,7 +40,13 @@
   "background": {
     "service_worker": "background.js"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/*", "icons/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   }
 }
