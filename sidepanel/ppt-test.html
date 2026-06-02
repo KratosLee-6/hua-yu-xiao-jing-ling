@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>PPT导出测试</title></head>
+<body style="font-family:sans-serif;padding:20px">
+<h2>PptxGenJS 扩展环境测试</h2>
+<div id="status" style="padding:10px;margin:10px 0;border-radius:8px;background:#f5f5f5"></div>
+<button id="btnTest" style="padding:12px 24px;font-size:16px;cursor:pointer">🔬 运行测试</button>
+<div id="log" style="margin-top:12px;font-size:12px;color:#666;white-space:pre-wrap"></div>
+
+<script src="../lib/jszip.min.js"></script>
+<script>
+// 动态加载 PptxGenJS 并测试
+const statusEl = document.getElementById('status');
+const logEl = document.getElementById('log');
+function log(msg) { logEl.textContent += msg + '\n'; }
+
+async function runTest() {
+  logEl.textContent = '';
+  statusEl.textContent = '⏳ 测试中...';
+  statusEl.style.background = '#fff3cd';
+
+  // Step 1: 动态加载 PptxGenJS
+  log('Step 1: 动态加载 PptxGenJS...');
+  try {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('CDN加载失败'));
+      document.head.appendChild(s);
+    });
+    log('✅ CDN加载成功');
+  } catch(e) {
+    log('❌ CDN加载失败: ' + e.message);
+    // 尝试本地加载
+    log('Step 1b: 尝试本地加载...');
+    try {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = '../lib/pptxgen.bundle.js';
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('本地加载失败'));
+        document.head.appendChild(s);
+      });
+      log('✅ 本地加载成功');
+    } catch(e2) {
+      log('❌ 本地也加载失败: ' + e2.message);
+      statusEl.textContent = '❌ 库加载失败';
+      statusEl.style.background = '#f8d7da';
+      return;
+    }
+  }
+
+  // Step 2: 检查 PptxGenJS 是否可用
+  log('Step 2: 检查 PptxGenJS 全局变量...');
+  if (typeof PptxGenJS === 'undefined') {
+    log('❌ PptxGenJS 是 undefined! 可能是模块作用域问题');
+    log('尝试 window.PptxGenJS: ' + typeof window.PptxGenJS);
+  } else {
+    log('✅ PptxGenJS 类型: ' + typeof PptxGenJS);
+  }
+
+  // Step 3: 尝试创建实例
+  log('Step 3: 创建 PptxGenJS 实例...');
+  try {
+    const Pptx = window.PptxGenJS || PptxGenJS;
+    const pptx = new Pptx();
+    log('✅ 实例创建成功, 类型: ' + typeof pptx);
+
+    // Step 4: 添加测试幻灯片
+    log('Step 4: 添加测试幻灯片...');
+    const slide = pptx.addSlide();
+    slide.addText('测试标题', { x: 1, y: 0.5, w: 8, h: 1, fontSize: 24, color: 'E8783B', bold: true });
+    slide.addText('如果你看到这行字，说明PptxGenJS在扩展中运行正常！', { x: 1, y: 2, w: 8, h: 2, fontSize: 14 });
+    log('✅ 幻灯片创建成功');
+
+    // Step 5: 生成并下载
+    log('Step 5: 生成PPTX文件...');
+    const blob = await pptx.writeFile({ fileName: 'test-output.pptx' });
+    log('✅ PPTX生成完成! 文件应该已下载');
+
+    statusEl.textContent = '✅ 全部测试通过！PptxGenJS 可以在扩展中使用';
+    statusEl.style.background = '#d4edda';
+  } catch(e) {
+    log('❌ 失败: ' + e.message);
+    log('Stack: ' + (e.stack || '无'));
+    statusEl.textContent = '❌ 测试失败: ' + e.message;
+    statusEl.style.background = '#f8d7da';
+  }
+}
+
+document.getElementById('btnTest').addEventListener('click', runTest);
+</script>
+</body>
+</html>
